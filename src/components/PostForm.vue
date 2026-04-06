@@ -1,4 +1,3 @@
-
 <script setup>
 import { ref, watch } from "vue";
 import * as api from "../api/post.js";
@@ -8,6 +7,8 @@ import CommentForm from "./CommentForm.vue";
 
 const props = defineProps({
   post: Object,
+  submitError: { type: Boolean, default: false },
+  deleteError: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["close", "submitted", "delete", "cancel"]);
@@ -16,7 +17,6 @@ const title = ref("");
 const body = ref("");
 const isEditing = ref(false);
 const errors = ref({ title: false, body: false });
-
 
 const comments = ref([]);
 const isLoadingComments = ref(false);
@@ -102,20 +102,24 @@ const handleDeleteComment = async (commentId) => {
   <div class="tile is-child box">
     <div class="content">
       <div v-if="post && !isEditing">
-        <div class="block is-flex is-justify-content-space-between is-align-items-center">
+        <div
+          class="block is-flex is-justify-content-space-between is-align-items-center">
           <h2>#{{ post.id }}: {{ post.title }}</h2>
           <div class="is-flex">
-            <span class="icon is-small is-right is-clickable" @click="isEditing = true">
+            <span
+              class="icon is-small is-right is-clickable"
+              @click="isEditing = true">
               <i class="fas fa-pen-to-square"></i>
             </span>
-            <span class="icon is-small is-right has-text-danger is-clickable ml-3" @click="$emit('delete', post.id)">
+            <span
+              class="icon is-small is-right has-text-danger is-clickable ml-3"
+              @click="$emit('delete', post.id)">
               <i class="fas fa-trash"></i>
             </span>
           </div>
         </div>
 
         <p>{{ post.body }}</p>
-
 
         <CommentList
           :comments="comments"
@@ -130,6 +134,13 @@ const handleDeleteComment = async (commentId) => {
           @click="showCommentForm = true">
           Write a comment
         </button>
+
+        <div v-if="submitError" class="notification is-danger">
+          Error saving post. Please try again.
+        </div>
+        <div v-if="deleteError" class="notification is-danger">
+          Error deleting post. Please try again.
+        </div>
 
         <CommentForm
           v-if="showCommentForm"
@@ -151,15 +162,21 @@ const handleDeleteComment = async (commentId) => {
                 id="post-title"
                 placeholder="Post title"
                 class="input"
-                :class="{ 'is-danger': errors.title }"  />
+                :class="{ 'is-danger': errors.title }" />
               <span class="icon is-small is-left">
                 <i class="fas fa-user"></i>
               </span>
-              <span v-if="errors.title" class="icon is-small is-right has-text-danger" data-cy="ErrorIcon">
+              <span
+                v-if="errors.title"
+                class="icon is-small is-right has-text-danger"
+                data-cy="ErrorIcon">
                 <i class="fas fa-exclamation-triangle"></i>
               </span>
             </div>
-            <p v-if="errors.title" class="help is-danger" data-cy="ErrorMessage">
+            <p
+              v-if="errors.title"
+              class="help is-danger"
+              data-cy="ErrorMessage">
               Title is required
             </p>
           </div>
@@ -186,7 +203,10 @@ const handleDeleteComment = async (commentId) => {
               </button>
             </div>
             <div class="control">
-              <button type="button" class="button is-link is-light" @click="handleCancel">
+              <button
+                type="button"
+                class="button is-link is-light"
+                @click="handleCancel">
                 Cancel
               </button>
             </div>

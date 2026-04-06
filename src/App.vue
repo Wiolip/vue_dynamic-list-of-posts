@@ -10,10 +10,11 @@ const currentUser = ref(JSON.parse(localStorage.getItem("user")) || null);
 const posts = ref([]);
 const isLoadingPosts = ref(false);
 const postsError = ref(false);
+const postSubmitError = ref(false);
+const postDeleteError = ref(false);
 
 const isSidebarOpen = ref(false);
 const selectedPost = ref(null);
-
 
 const handleLogin = (user) => {
   currentUser.value = user;
@@ -27,7 +28,6 @@ const handleLogout = () => {
   posts.value = [];
   isSidebarOpen.value = false;
 };
-
 
 const fetchPosts = async () => {
   if (!currentUser.value) return;
@@ -43,7 +43,6 @@ const fetchPosts = async () => {
     isLoadingPosts.value = false;
   }
 };
-
 
 const openCreateForm = () => {
   selectedPost.value = null;
@@ -65,6 +64,7 @@ const closeSidebar = () => {
 };
 
 const handlePostSubmit = async (data) => {
+  postSubmitError.value = false;
   try {
     if (data.id) {
       const updatedPost = await api.updatePost(data);
@@ -80,17 +80,18 @@ const handlePostSubmit = async (data) => {
       selectedPost.value = newPost;
     }
   } catch (err) {
-    console.error("Error saving post");
+    postSubmitError.value = true;
   }
 };
 
 const handleDeletePost = async (postId) => {
+  postDeleteError.value = false;
   try {
     await api.deletePost(postId);
     posts.value = posts.value.filter((p) => p.id !== postId);
     closeSidebar();
   } catch (err) {
-    console.error("Error deleting post");
+    postDeleteError.value = true;
   }
 };
 
@@ -128,6 +129,8 @@ onMounted(() => {
               :class="{ 'Sidebar--open': isSidebarOpen }">
               <PostForm
                 :post="selectedPost"
+                :submit-error="postSubmitError"
+                :delete-error="postDeleteError"
                 @close="closeSidebar"
                 @submitted="handlePostSubmit"
                 @delete="handleDeletePost" />

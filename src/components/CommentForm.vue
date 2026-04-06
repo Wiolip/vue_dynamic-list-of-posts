@@ -5,7 +5,7 @@ defineProps({
   isSubmitting: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(["submitted"]);
+const emit = defineEmits(["submitted", "cancel"]);
 
 const name = ref("");
 const email = ref("");
@@ -110,6 +110,14 @@ const handleClear = () => {
           Add Comment
         </button>
       </div>
+      <div class="control">
+    <button
+      type="reset"
+      class="button is-link is-light"
+      @click="handleClear">
+      Clear
+    </button>
+  </div>
       <div class="control">
         <button
           type="button"
