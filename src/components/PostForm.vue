@@ -22,6 +22,8 @@ const comments = ref([]);
 const isLoadingComments = ref(false);
 const commentsError = ref(false);
 const showCommentForm = ref(false);
+const addCommentError = ref(false);
+const deleteCommentError = ref(false);
 
 const isSubmittingComment = ref(false);
 
@@ -74,6 +76,7 @@ const handleCancel = () => {
 
 const handleAddComment = async (data) => {
   isSubmittingComment.value = true;
+  addCommentError.value = false;
   try {
     const newComment = await api.createComment({
       ...data,
@@ -82,18 +85,19 @@ const handleAddComment = async (data) => {
     comments.value.push(newComment);
     showCommentForm.value = false;
   } catch (err) {
-    console.error("Error adding comment");
+    addCommentError.value = true;
   } finally {
     isSubmittingComment.value = false;
   }
 };
 
 const handleDeleteComment = async (commentId) => {
+  deleteCommentError.value = false;
   comments.value = comments.value.filter((c) => c.id !== commentId);
   try {
     await api.deleteComment(commentId);
   } catch (err) {
-    console.error("Error deleting comment");
+    deleteCommentError.value = true;
   }
 };
 </script>
@@ -140,6 +144,13 @@ const handleDeleteComment = async (commentId) => {
         </div>
         <div v-if="deleteError" class="notification is-danger">
           Error deleting post. Please try again.
+        </div>
+        <div v-if="addCommentError" class="notification is-danger">
+          Error adding comment. Please try again.
+        </div>
+
+        <div v-if="deleteCommentError" class="notification is-danger">
+          Error deleting comment. Please try again.
         </div>
 
         <CommentForm
