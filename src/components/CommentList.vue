@@ -1,3 +1,15 @@
+<script setup>
+import PostLoader from './PostLoader.vue';
+
+defineProps({
+  comments: { type: Array, required: true },
+  isLoading: { type: Boolean, default: false },
+  hasError: { type: Boolean, default: false },
+});
+
+defineEmits(['delete-comment']);
+</script>
+
 <template>
 
     <PostLoader v-if="isLoading" />
@@ -29,14 +41,3 @@
 
 </template>
 
-<script setup>
-import PostLoader from './PostLoader.vue';
-
-defineProps({
-  comments: { type: Array, required: true },
-  isLoading: { type: Boolean, default: false },
-  hasError: { type: Boolean, default: false },
-});
-
-defineEmits(['delete-comment']);
-</script>

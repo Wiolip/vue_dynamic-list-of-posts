@@ -1,3 +1,103 @@
+
+<script setup>
+import { ref, watch } from "vue";
+import * as api from "../api/post.js";
+import PostLoader from "./PostLoader.vue";
+import CommentList from "./CommentList.vue";
+import CommentForm from "./CommentForm.vue";
+
+const props = defineProps({
+  post: Object,
+});
+
+const emit = defineEmits(["close", "submitted", "delete", "cancel"]);
+
+const title = ref("");
+const body = ref("");
+const isEditing = ref(false);
+const errors = ref({ title: false, body: false });
+
+
+const comments = ref([]);
+const isLoadingComments = ref(false);
+const commentsError = ref(false);
+const showCommentForm = ref(false);
+
+const isSubmittingComment = ref(false);
+
+const fetchComments = async (postId) => {
+  isLoadingComments.value = true;
+  commentsError.value = false;
+  try {
+    comments.value = await api.getComments(postId);
+  } catch (err) {
+    commentsError.value = true;
+  } finally {
+    isLoadingComments.value = false;
+  }
+};
+
+watch(
+  () => props.post,
+  (newPost) => {
+    isEditing.value = false;
+    title.value = newPost?.title || "";
+    body.value = newPost?.body || "";
+    errors.value = { title: false, body: false };
+    comments.value = [];
+    showCommentForm.value = false;
+    if (newPost?.id) {
+      fetchComments(newPost.id);
+    }
+  },
+  { immediate: true },
+);
+
+const handleSubmit = () => {
+  errors.value.title = !title.value.trim();
+  errors.value.body = !body.value.trim();
+  if (errors.value.title || errors.value.body) return;
+  emit("submitted", {
+    title: title.value,
+    body: body.value,
+    id: props.post?.id,
+  });
+};
+
+const handleCancel = () => {
+  if (isEditing.value && props.post) {
+    isEditing.value = false;
+  } else {
+    emit("close");
+  }
+};
+
+const handleAddComment = async (data) => {
+  isSubmittingComment.value = true;
+  try {
+    const newComment = await api.createComment({
+      ...data,
+      postId: props.post.id,
+    });
+    comments.value.push(newComment);
+    showCommentForm.value = false;
+  } catch (err) {
+    console.error("Error adding comment");
+  } finally {
+    isSubmittingComment.value = false;
+  }
+};
+
+const handleDeleteComment = async (commentId) => {
+  comments.value = comments.value.filter((c) => c.id !== commentId);
+  try {
+    await api.deleteComment(commentId);
+  } catch (err) {
+    console.error("Error deleting comment");
+  }
+};
+</script>
+
 <template>
   <div class="tile is-child box">
     <div class="content">
@@ -96,103 +196,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, watch } from "vue";
-import * as api from "../api/post.js";
-import PostLoader from "./PostLoader.vue";
-import CommentList from "./CommentList.vue";
-import CommentForm from "./CommentForm.vue";
-
-const props = defineProps({
-  post: Object,
-});
-
-const emit = defineEmits(["close", "submitted", "delete", "cancel"]);
-
-// POST FORM
-const title = ref("");
-const body = ref("");
-const isEditing = ref(false);
-const errors = ref({ title: false, body: false });
-
-// KOMENTARZE
-const comments = ref([]);
-const isLoadingComments = ref(false);
-const commentsError = ref(false);
-const showCommentForm = ref(false);
-
-const isSubmittingComment = ref(false);
-
-const fetchComments = async (postId) => {
-  isLoadingComments.value = true;
-  commentsError.value = false;
-  try {
-    comments.value = await api.getComments(postId);
-  } catch (err) {
-    commentsError.value = true;
-  } finally {
-    isLoadingComments.value = false;
-  }
-};
-
-watch(
-  () => props.post,
-  (newPost) => {
-    isEditing.value = false;
-    title.value = newPost?.title || "";
-    body.value = newPost?.body || "";
-    errors.value = { title: false, body: false };
-    comments.value = [];
-    showCommentForm.value = false;
-    if (newPost?.id) {
-      fetchComments(newPost.id);
-    }
-  },
-  { immediate: true },
-);
-
-const handleSubmit = () => {
-  errors.value.title = !title.value.trim();
-  errors.value.body = !body.value.trim();
-  if (errors.value.title || errors.value.body) return;
-  emit("submitted", {
-    title: title.value,
-    body: body.value,
-    id: props.post?.id,
-  });
-};
-
-const handleCancel = () => {
-  if (isEditing.value && props.post) {
-    isEditing.value = false;
-  } else {
-    emit("close");
-  }
-};
-
-const handleAddComment = async (data) => {
-  isSubmittingComment.value = true;
-  try {
-    const newComment = await api.createComment({
-      ...data,
-      postId: props.post.id,
-    });
-    comments.value.push(newComment);
-    showCommentForm.value = false;
-  } catch (err) {
-    console.error("Błąd dodawania komentarza");
-  } finally {
-    isSubmittingComment.value = false;
-  }
-};
-
-const handleDeleteComment = async (commentId) => {
-  comments.value = comments.value.filter((c) => c.id !== commentId);
-  try {
-    await api.deleteComment(commentId);
-  } catch (err) {
-    console.error("Błąd usuwania komentarza");
-  }
-};
-</script>

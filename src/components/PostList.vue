@@ -9,6 +9,7 @@ defineProps({
   isLoading: { type: Boolean, default: false },
   hasError: { type: Boolean, default: false },
   selectedPostId: { type: Number, default: null },
+  isSidebarOpen: { type: Boolean, default: false },
 });
 
 defineEmits(['open-post', 'add-post']);
@@ -24,6 +25,7 @@ defineEmits(['open-post', 'add-post']);
           type="button"
           class="button is-link"
           @click="$emit('add-post')"
+          :class="{ 'is-light': isSidebarOpen }"
         >
           Add New Post
         </button>

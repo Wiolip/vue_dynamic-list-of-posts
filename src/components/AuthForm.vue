@@ -1,35 +1,3 @@
-<template>
-  <section class="container is-flex is-justify-content-center">
-    <form v-if="!isRegistrationRequired" @submit.prevent="handleLogin" class="box mt-5">
-      <h1 class="title is-3">Log in to your account</h1>
-      <div class="field">
-        <label class="label"> Email </label>
-        <div class="control has-icons-left">
-          <input v-model="email" type="email" class="input" placeholder="Enter your email" required />
-          <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
-        </div>
-      </div>
-      <button type="submit" class="button is-primary" :class="{'is-loading': isLoading}">Login</button>
-    </form>
-
-    <form v-else @submit.prevent="handleRegister" class="box mt-5">
-      <h1 class="title is-3">You need to register</h1>
-      <div class="field">
-        <label class="label">Email</label>
-        <input :value="email" type="email" class="input" disabled />
-      </div>
-      <div class="field">
-        <label class="label">Your Name</label>
-        <div class="control has-icons-left">
-          <input v-model="name" type="text" class="input" placeholder="Enter your name" required minlength="4" />
-          <span class="icon is-small is-left"><i class="fas fa-user"></i></span>
-        </div>
-      </div>
-      <button type="submit" class="button is-primary" :class="{'is-loading': isLoading}">Register</button>
-    </form>
-  </section>
-</template>
-
 <script setup>
 import { ref } from 'vue';
 import { client } from '../api/post.js';
@@ -87,3 +55,36 @@ const handleRegister = async () => {
   }
 };
 </script>
+
+<template>
+  <section class="container is-flex is-justify-content-center">
+    <form v-if="!isRegistrationRequired" @submit.prevent="handleLogin" class="box mt-5">
+      <h1 class="title is-3">Log in to your account</h1>
+      <div class="field">
+        <label class="label"> Email </label>
+        <div class="control has-icons-left">
+          <input v-model="email" type="email" class="input" placeholder="Enter your email" required />
+          <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
+        </div>
+      </div>
+      <button type="submit" class="button is-primary" :class="{'is-loading': isLoading}">Login</button>
+    </form>
+
+    <form v-else @submit.prevent="handleRegister" class="box mt-5">
+      <h1 class="title is-3">You need to register</h1>
+      <div class="field">
+        <label class="label">Email</label>
+        <input :value="email" type="email" class="input" disabled />
+      </div>
+      <div class="field">
+        <label class="label">Your Name</label>
+        <div class="control has-icons-left">
+          <input v-model="name" type="text" class="input" placeholder="Enter your name" required minlength="4" />
+          <span class="icon is-small is-left"><i class="fas fa-user"></i></span>
+        </div>
+      </div>
+      <button type="submit" class="button is-primary" :class="{'is-loading': isLoading}">Register</button>
+    </form>
+  </section>
+</template>
+

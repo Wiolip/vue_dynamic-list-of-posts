@@ -1,3 +1,42 @@
+<script setup>
+import { ref } from "vue";
+
+defineProps({
+  isSubmitting: { type: Boolean, default: false },
+});
+
+const emit = defineEmits(["submitted"]);
+
+const name = ref("");
+const email = ref("");
+const body = ref("");
+
+const errors = ref({ name: false, email: false, body: false });
+
+const handleSubmit = async () => {
+  errors.value.name = !name.value.trim();
+  errors.value.email = !email.value.trim();
+  errors.value.body = !body.value.trim();
+
+  if (errors.value.name || errors.value.email || errors.value.body) return;
+
+  emit("submitted", {
+    name: name.value,
+    email: email.value,
+    body: body.value,
+  });
+
+  body.value = "";
+};
+
+const handleClear = () => {
+  name.value = "";
+  email.value = "";
+  body.value = "";
+  errors.value = { name: false, email: false, body: false };
+};
+</script>
+
 <template>
   <form @submit.prevent="handleSubmit">
     <div class="field" data-cy="NameField">
@@ -83,41 +122,3 @@
   </form>
 </template>
 
-<script setup>
-import { ref } from "vue";
-
-defineProps({
-  isSubmitting: { type: Boolean, default: false },
-});
-
-const emit = defineEmits(["submitted"]);
-
-const name = ref("");
-const email = ref("");
-const body = ref("");
-
-const errors = ref({ name: false, email: false, body: false });
-
-const handleSubmit = async () => {
-  errors.value.name = !name.value.trim();
-  errors.value.email = !email.value.trim();
-  errors.value.body = !body.value.trim();
-
-  if (errors.value.name || errors.value.email || errors.value.body) return;
-
-  emit("submitted", {
-    name: name.value,
-    email: email.value,
-    body: body.value,
-  });
-
-  body.value = "";
-};
-
-const handleClear = () => {
-  name.value = "";
-  email.value = "";
-  body.value = "";
-  errors.value = { name: false, email: false, body: false };
-};
-</script>

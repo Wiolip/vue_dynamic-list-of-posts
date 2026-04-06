@@ -4,20 +4,17 @@ import * as api from "./api/post.js";
 import AuthForm from "./components/AuthForm.vue";
 import AppHeader from "./components/AppHeader.vue";
 import PostList from "./components/PostList.vue";
-import PostLoader from "./components/PostLoader.vue";
-import PostForm from "./components/PostForm.vue"; // Upewnij się, że masz ten komponent
+import PostForm from "./components/PostForm.vue";
 
-// STAN APLIKACJI
 const currentUser = ref(JSON.parse(localStorage.getItem("user")) || null);
 const posts = ref([]);
 const isLoadingPosts = ref(false);
 const postsError = ref(false);
 
-// STAN SIDEBARU
 const isSidebarOpen = ref(false);
 const selectedPost = ref(null);
 
-// LOGIKA LOGOWANIA / WYLOGOWANIA
+
 const handleLogin = (user) => {
   currentUser.value = user;
   localStorage.setItem("user", JSON.stringify(user));
@@ -31,7 +28,7 @@ const handleLogout = () => {
   isSidebarOpen.value = false;
 };
 
-// POBIERANIE POSTÓW
+
 const fetchPosts = async () => {
   if (!currentUser.value) return;
 
@@ -47,7 +44,7 @@ const fetchPosts = async () => {
   }
 };
 
-// SIDEBAR ACTIONS
+
 const openCreateForm = () => {
   selectedPost.value = null;
   isSidebarOpen.value = true;
@@ -82,9 +79,8 @@ const handlePostSubmit = async (data) => {
       posts.value.push(newPost);
       selectedPost.value = newPost;
     }
-
   } catch (err) {
-    console.error("Błąd zapisu posta");
+    console.error("Error saving post");
   }
 };
 
@@ -94,10 +90,9 @@ const handleDeletePost = async (postId) => {
     posts.value = posts.value.filter((p) => p.id !== postId);
     closeSidebar();
   } catch (err) {
-    console.error("Błąd usuwania posta");
+    console.error("Error deleting post");
   }
 };
-
 
 onMounted(() => {
   if (currentUser.value) {
@@ -128,7 +123,9 @@ onMounted(() => {
                 @open-post="openPostInSidebar" />
             </div>
 
-            <div v-if="isSidebarOpen" class="tile is-parent is-8-desktop">
+            <div
+              class="tile is-parent is-8-desktop Sidebar"
+              :class="{ 'Sidebar--open': isSidebarOpen }">
               <PostForm
                 :post="selectedPost"
                 @close="closeSidebar"
@@ -141,3 +138,28 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style>
+.Sidebar {
+  overflow: hidden;
+  opacity: 0;
+  transition-property: max-width, opacity;
+  transition-duration: 0.5s;
+  transition-timing-function: ease-in-out;
+}
+
+@media (min-width: 769px) {
+  .Sidebar {
+    max-width: 0;
+    height: 0;
+  }
+  .Sidebar--open {
+    max-width: 50%;
+    height: auto;
+  }
+}
+
+.Sidebar--open {
+  opacity: 1;
+}
+</style>

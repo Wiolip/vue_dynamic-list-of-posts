@@ -1,3 +1,14 @@
+<script setup>
+defineProps({
+  user: {
+    type: Object,
+    required: true
+  }
+});
+
+defineEmits(['logout']);
+</script>
+
 <template>
   <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-item">
@@ -20,13 +31,3 @@
   </nav>
 </template>
 
-<script setup>
-defineProps({
-  user: {
-    type: Object,
-    required: true
-  }
-});
-
-defineEmits(['logout']);
-</script>
